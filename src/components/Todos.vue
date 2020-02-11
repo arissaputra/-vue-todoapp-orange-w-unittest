@@ -112,16 +112,16 @@ export default {
       this.todos_temp.length = 0;
       switch (this.sort) {
         case "notSorted": {
-          console.log("notSorted");
+          // console.log("notSorted");
           break;
         }
         case "deadline": {
-          console.log("deadline");
+          // console.log("deadline");
           this.vsort();
           break;
         }
         case "today": {
-          console.log("today");
+          // console.log("today");
           for (let index = 0; index < this.todos.length; index++) {
             const element = this.todos[index];
             if (
@@ -134,7 +134,7 @@ export default {
           break;
         }
         case "tomorrow": {
-          console.log("tomorrow");
+          // console.log("tomorrow");
           for (let index = 0; index < this.todos.length; index++) {
             const element = this.todos[index];
             let tomorrowDate = new Date();
@@ -147,7 +147,7 @@ export default {
           break;
         }
         case "completed": {
-          console.log("completed");
+          // console.log("completed");
           for (let index = 0; index < this.todos.length; index++) {
             const element = this.todos[index];
             if (element.done) {
@@ -157,7 +157,7 @@ export default {
           break;
         }
         case "incomplete": {
-          console.log("incomplete");
+          // console.log("incomplete");
           for (let index = 0; index < this.todos.length; index++) {
             const element = this.todos[index];
             if (!element.done) {

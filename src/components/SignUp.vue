@@ -81,7 +81,7 @@ export default {
     async onSubmit() {
       this.toggleLoading()
       const res = await this.signup();
-      console.log(res);
+      // console.log(res);
 
       if (res.statusCode) {
         if (res.statusCode == 409) {
