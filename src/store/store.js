@@ -61,7 +61,7 @@ export const store = new Vuex.Store({
 
         },
         async storeTodo({ dispatch }, { form }) {
-            const res = await api.storeTodo(form)
+            const res = await api.storeTodo(form)            
             const response = await dispatch('checkTokenExpired', res)
             return response
         },

@@ -1,19 +1,44 @@
-import { shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import CreateEdit from "@/components/CreateEdit.vue";
 import registerFaIcons from '@/fa.js';
 import flushPromises from "flush-promises"
+import Vuex from "vuex"
+import { store } from '@/store/store'
+import axios from 'axios'
 
 registerFaIcons();
 
 let wrapper;
 let eraseButton;
 let saveButton;
+const description = 'A random todo';
+const now = new Date().toISOString()
+
+let url = ''
+let body = {}
+let mockError = false
+
+jest.mock("axios", () => ({
+    post: (_url, _body) => {
+        return new Promise((resolve) => {
+            if (mockError) {
+                throw Error()
+            }
+
+            url = _url
+            body = _body
+            resolve({
+                data: 'some data'
+            })
+        })
+    }
+}))
 
 const factory = ({ propsData = {}, mocks = {}, stubs = {} }) => {
     return shallowMount(CreateEdit, {
         propsData,
         mocks,
-        stubs,
+        stubs
     });
 };
 
@@ -22,21 +47,6 @@ beforeEach(() => {
     eraseButton = wrapper.find("[type='button']");
     saveButton = wrapper.find("[type='submit']");
 });
-
-let url = ''
-let data = ''
-const description = 'A random todo';
-const now = new Date()
-
-const mockHttp = {
-    get: (_url, _data) => {
-        return new Promise((resolve, reject) => {
-            url = _url
-            data = _data
-            resolve()
-        })
-    }
-}
 
 describe('Insert Page', () => {
     it('Has description, deadline, erase button, save button', () => {
@@ -53,9 +63,8 @@ describe('Insert Page', () => {
                     deadline: now
                 }
             })
-            await wrapper.vm.$nextTick();
 
-            // check current data
+            // check current data        
             expect(wrapper.vm.form).toStrictEqual({
                 description,
                 deadline: now
@@ -63,7 +72,6 @@ describe('Insert Page', () => {
 
             // check data after the form erased
             eraseButton.trigger('click');
-            await wrapper.vm.$nextTick();
             expect(wrapper.vm.form).toStrictEqual({
                 description: null,
                 deadline: null
@@ -71,28 +79,36 @@ describe('Insert Page', () => {
 
         }),
         it('Save Button Works Properly', async () => {
-            wrapper = factory({
-                mocks: {
-                    $http: mockHttp
-                }
-            });
-            wrapper.setData({
-                form: {
-                    description,
-                    deadline: now
-                }
-            })
-            await wrapper.vm.$nextTick();
+            const form = {
+                description,
+                deadline: now
+            }
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFyaUBnYXRvdS5jb20iLCJzdWIiOiI5NzBhZDlmMC00ZDczLTExZWEtOTMxMi03ZjQyNWQxYjlkNmQiLCJpYXQiOjE1ODE0OTY5NDgsImV4cCI6MTU4MTUwMDU0OH0.pM4NGHKMnzb5VJ18cfFO2QFPcYW4IrvLlxf_HmAR8PA'
+            
+            // await store.dispatch('storeIdentity', token)
+            await store.dispatch('storeTodo', { form })
 
-            // wrapper.find("form").trigger("submit.prevent")
-            // await flushPromises()
-
-            // expect(url).toBe("https://cdc-todo-be.herokuapp.com/tasks/")
-            // expect(data).toEqual({
+            // expect(url).toBe("/api/authenticate")
+            // expect(body).toEqual({ username, password })
+            // expect(commit).toHaveBeenCalledWith(
+            // "SET_AUTHENTICATED", true)
+        }),
+        it("Catches if error", async () => {
+            // mockError = true
+          
+            // await expect(await store.dispatch('storeTodo', {}))
+            //   .rejects.toThrow("API Error occurred.")
+            // const form = {
             //     description,
             //     deadline: now
-            // })
-        }),
+            // }
+            // console.log(form);
+            // const data = await axios.post('https://cdc-web-frontend.herokuapp.com/todos', form)
+            // console.log(data);
+            
+            // expect(data).toBeDefined()
+            // expect(data.entity.name).toEqual('Koen van Gilst')
+          })
         it('Validation Works Properly', () => {
             // Description validation
             // Deadline validation

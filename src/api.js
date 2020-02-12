@@ -1,7 +1,7 @@
 import axios from "axios";
 const baseUrl = "https://cdc-todo-be.herokuapp.com"
 
-function extractData(response) {
+function extractData(response) {  
   return response.data;
 }
 
