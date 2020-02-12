@@ -45,7 +45,7 @@
             <!-- form-group// -->
             <div class="form-group">
               <button :disabled="isLoading" type="submit" class="btn btn-primary btn-block">
-                <font-awesome-icon v-if="isLoading" icon="spinner" spin/> {{isLoading ? ' Attempting ..':' Login'}}
+                <font-awesome-icon v-if="isLoading" icon="spinner" spin/> {{isLoading ? ' Attempting to login ..':' Login'}}
               </button>
             </div>
             <!-- form-group// -->
