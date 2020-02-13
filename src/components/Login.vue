@@ -75,13 +75,7 @@ export default {
       });
     },
     showMsg(msg, type = "error", icon = "warning") {
-      this.$toasted.show(msg, {
-        theme: "toasted-primary",
-        type: type,
-        icon: icon,
-        position: "top-center",
-        duration: 3000
-      });
+      this.toast(msg, type, icon)
     },
     async onSubmit() {
       this.toggleLoading()

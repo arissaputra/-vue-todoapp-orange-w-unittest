@@ -203,7 +203,7 @@ export default {
           {
             title: "Delete",
             handler: async () => {
-              const { success } = await this.deleteTodo(selectedTodo.id);
+              const { success, msg } = await this.deleteTodo(selectedTodo.id);
               if (success) {
                 this.toast("Deleted successfully!!", "success", "trash");
                 this.$modal.hide("dialog");
@@ -213,6 +213,8 @@ export default {
                     return this.todos.splice(index, 1);
                   }
                 });
+              } else {
+                this.toast(msg, "error", "warning")
               }
             }
           }
@@ -224,7 +226,10 @@ export default {
         description: todo.description,
         done: todo.done
       };
-      await this.markTodo(todo.id, form);
+      const { success, msg } = await this.markTodo(todo.id, form);
+      if (!success) {
+        this.toast(msg, "error", "warning")
+      }
     },
     deleteTodo(todo_id) {
       return this.$store.dispatch("deleteTodo", { todo_id });
@@ -237,7 +242,10 @@ export default {
     },
     async getTodos() {
       this.toggleLoading();
-      await this.$store.dispatch("getTodos");
+      const { success, msg } = await this.$store.dispatch("getTodos");
+      if (!success) {
+        this.toast(msg, "error", "warning")
+      }
       this.toggleLoading();
     }
   },

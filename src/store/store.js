@@ -43,10 +43,11 @@ export const store = new Vuex.Store({
     actions: {
         async getTodos({ commit, dispatch }) {
             const res = await api.getTodos()
-            const { success } = await dispatch('checkTokenExpired', res)
-            if (success) {
+            const response = await dispatch('checkTokenExpired', res)
+            if (response.success) {
                 commit('SET_TODOS', res)
             }
+            return response
         },
         async updateTodo({ dispatch }, { todo_id, form }) {
             const res = await api.updateTodo(todo_id, form)
@@ -79,16 +80,16 @@ export const store = new Vuex.Store({
                 }
             } else {
                 const { statusCode, message='Unauthorized' } = res
-                Vue.toasted.error(`${statusCode} ${message}!`, {
-                    theme: "toasted-primary",
-                    icon: 'warning',
-                    position: "top-center",
-                    duration: 3000
-                });
+                // Vue.toasted.error(`${statusCode} ${message}!`, {
+                //     theme: "toasted-primary",
+                //     icon: 'warning',
+                //     position: "top-center",
+                //     duration: 3000
+                // });
                 router.push('login')
                 return {
                     success: false,
-                    msg: message
+                    msg: statusCode + ' ' + message
                 }
             }
         },
