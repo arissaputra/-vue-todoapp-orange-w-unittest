@@ -15,7 +15,6 @@ let url = ''
 let body = {}
 let mockError = false
 
-jest.mock('vue-toasted')
 jest.mock("axios", () => ({
     post: (_url, _body) => {
         return new Promise((resolve, reject) => {
@@ -23,7 +22,7 @@ jest.mock("axios", () => ({
                 reject({
                     response: {
                         data: {
-                            error: 'some error'
+                            statusCode: 500
                         }
 
                     }
@@ -32,7 +31,7 @@ jest.mock("axios", () => ({
                 url = _url
                 body = _body
                 resolve({
-                    data: ' some data '
+                    data: 'some data'
                 })
 
             }
@@ -62,63 +61,55 @@ describe('Insert Page', () => {
         expect(eraseButton.text()).toBe('Erase Form');
         expect(saveButton.text()).toBe('Save');
 
-    }),
-        it('Erase Button Works Properly', async () => {
-            wrapper.setData({
-                form: {
-                    description,
-                    deadline: now
-                }
-            })
-
-            // check current data        
-            expect(wrapper.vm.form).toStrictEqual({
-                description,
-                deadline: now
-            })
-
-            // check data after the form erased
-            eraseButton.trigger('click');
-            expect(wrapper.vm.form).toStrictEqual({
-                description: null,
-                deadline: null
-            })
-
-        }),
-        it('Insert Data Works Properly', async () => {
-            const form = {
+    })
+    it('Erase Button Works Properly', async () => {
+        wrapper.setData({
+            form: {
                 description,
                 deadline: now
             }
-
-            await store.dispatch('storeTodo', { form })
-
-            expect(url).toBe("https://cdc-todo-be.herokuapp.com/tasks/")
-            expect(body).toEqual({
-                description,
-                deadline: now
-            })
-        }),
-        it("Catches if error", async () => {
-            mockError = true
-            await store.dispatch('storeTodo', {}).then(res => {
-
-            }).catch(err => {
-                
-            })
-            
-
-
-            // await expect()
-            //   .rejects.toThrow("API Error occurred.")
-
-        }),
-        it('Validation Works Properly', async () => {
-            const failDesc = 'desc'  // less than 5 letters
-            wrapper.find('textarea').setValue(failDesc)
-            await wrapper.vm.$nextTick()
-
-            // Save Button disabled when validation fail
-            expect(saveButton.html().includes('disabled')).toBe(true)
         })
+
+        // check current data        
+        expect(wrapper.vm.form).toStrictEqual({
+            description,
+            deadline: now
+        })
+
+        // check data after the form erased
+        eraseButton.trigger('click');
+        expect(wrapper.vm.form).toStrictEqual({
+            description: null,
+            deadline: null
+        })
+
+    })
+    it('Insert Data Works Properly', async () => {
+        const form = {
+            description,
+            deadline: now
+        }
+
+        const res = await store.dispatch('storeTodo', { form })
+        expect(res.success).toBe(true)
+        expect(url).toBe("https://cdc-todo-be.herokuapp.com/tasks/")
+        expect(body).toEqual({
+            description,
+            deadline: now
+        })
+    })
+    it("Catches if error", async () => {
+        mockError = true
+        const res = await store.dispatch('storeTodo', {})
+        expect(res.success).toBe(false)
+
+    })
+    it('Validation Works Properly', async () => {
+        const failDesc = 'desc'  // less than 5 letters
+        wrapper.find('textarea').setValue(failDesc)
+        await wrapper.vm.$nextTick()
+
+        // Save Button disabled when validation fail
+        expect(saveButton.html().includes('disabled')).toBe(true)
+    })
 })
