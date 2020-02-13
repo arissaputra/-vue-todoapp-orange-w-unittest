@@ -199,11 +199,8 @@ export default {
       if (!this.$v.$invalid) {
         if (this.todo) {
           if (this.snapshot) {
-            const {
-              success: snap_success,
-              msg: snap_msg
-            } = await this.uploadSnapshot();
-            console.log(snap_success, snap_msg);
+            await this.uploadSnapshot();
+            
           }
           const { success, msg } = await this.updateTodo();
           this.popUpResult(success, msg);
@@ -216,7 +213,7 @@ export default {
 
         return this.toggleLoading();
       }
-      console.log("validation error");
+      // console.log("validation error");
       this.toggleLoading();
     },
     removeSnapshot() {
