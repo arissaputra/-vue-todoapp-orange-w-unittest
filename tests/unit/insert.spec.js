@@ -1,10 +1,7 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import CreateEdit from "@/components/CreateEdit.vue";
 import registerFaIcons from '@/fa.js';
-import flushPromises from "flush-promises"
-import Vuex from "vuex"
 import { store } from '@/store/store'
-import axios from 'axios'
 
 registerFaIcons();
 
@@ -18,18 +15,28 @@ let url = ''
 let body = {}
 let mockError = false
 
+jest.mock('vue-toasted')
 jest.mock("axios", () => ({
     post: (_url, _body) => {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             if (mockError) {
-                throw Error()
+                reject({
+                    response: {
+                        data: {
+                            error: 'some error'
+                        }
+
+                    }
+                })
+            } else {
+                url = _url
+                body = _body
+                resolve({
+                    data: ' some data '
+                })
+
             }
 
-            url = _url
-            body = _body
-            resolve({
-                data: 'some data'
-            })
         })
     }
 }))
@@ -78,40 +85,40 @@ describe('Insert Page', () => {
             })
 
         }),
-        it('Save Button Works Properly', async () => {
+        it('Insert Data Works Properly', async () => {
             const form = {
                 description,
                 deadline: now
             }
-            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFyaUBnYXRvdS5jb20iLCJzdWIiOiI5NzBhZDlmMC00ZDczLTExZWEtOTMxMi03ZjQyNWQxYjlkNmQiLCJpYXQiOjE1ODE0OTY5NDgsImV4cCI6MTU4MTUwMDU0OH0.pM4NGHKMnzb5VJ18cfFO2QFPcYW4IrvLlxf_HmAR8PA'
-            
-            // await store.dispatch('storeIdentity', token)
+
             await store.dispatch('storeTodo', { form })
 
-            // expect(url).toBe("/api/authenticate")
-            // expect(body).toEqual({ username, password })
-            // expect(commit).toHaveBeenCalledWith(
-            // "SET_AUTHENTICATED", true)
+            expect(url).toBe("https://cdc-todo-be.herokuapp.com/tasks/")
+            expect(body).toEqual({
+                description,
+                deadline: now
+            })
         }),
         it("Catches if error", async () => {
-            // mockError = true
-          
-            // await expect(await store.dispatch('storeTodo', {}))
-            //   .rejects.toThrow("API Error occurred.")
-            // const form = {
-            //     description,
-            //     deadline: now
-            // }
-            // console.log(form);
-            // const data = await axios.post('https://cdc-web-frontend.herokuapp.com/todos', form)
-            // console.log(data);
+            mockError = true
+            await store.dispatch('storeTodo', {}).then(res => {
+
+            }).catch(err => {
+                
+            })
             
-            // expect(data).toBeDefined()
-            // expect(data.entity.name).toEqual('Koen van Gilst')
-          })
-        it('Validation Works Properly', () => {
-            // Description validation
-            // Deadline validation
+
+
+            // await expect()
+            //   .rejects.toThrow("API Error occurred.")
+
+        }),
+        it('Validation Works Properly', async () => {
+            const failDesc = 'desc'  // less than 5 letters
+            wrapper.find('textarea').setValue(failDesc)
+            await wrapper.vm.$nextTick()
+
             // Save Button disabled when validation fail
+            expect(saveButton.html().includes('disabled')).toBe(true)
         })
 })

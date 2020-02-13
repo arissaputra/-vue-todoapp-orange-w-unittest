@@ -162,7 +162,7 @@ export default {
     },
     async onSubmit() {
       this.$v.$touch();
-      this.toggleLoading()
+      this.toggleLoading()      
       if (!this.$v.$invalid){
         
         if (this.todo) {

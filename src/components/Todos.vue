@@ -57,7 +57,7 @@
                   </button>
                 </router-link>
                 <button @click="del(todo)" class="btn btn-sm btn-danger">
-                  <font-awesome-icon icon="trash" />
+                  <font-awesome-icon icon="trash" /> 
                 </button>
               </div>
             </li>
